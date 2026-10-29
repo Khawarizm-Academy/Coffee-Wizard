@@ -57,7 +57,7 @@ export function Navbar() {
             <Link
               key={l.label}
               to={l.to}
-              hash={l.hash}
+              {...(l.hash ? { hash: l.hash } : {})}
               className="text-sm font-semibold text-on-dark-muted transition-colors hover:text-amber"
               activeOptions={{ exact: true, includeHash: true }}
               activeProps={{ className: "text-amber" }}
@@ -92,7 +92,7 @@ export function Navbar() {
               <li key={l.label}>
                 <Link
                   to={l.to}
-                  hash={l.hash}
+                  {...(l.hash ? { hash: l.hash } : {})}
                   onClick={() => setOpen(false)}
                   className="block py-3 text-base font-semibold text-on-dark hover:text-amber"
                 >
@@ -128,7 +128,7 @@ export function Footer() {
           <ul className="mt-4 grid grid-cols-2 gap-2 text-sm">
             {links.map((l) => (
               <li key={l.label}>
-                <Link to={l.to} hash={l.hash} className="text-on-dark-muted hover:text-amber">
+                <Link to={l.to} {...(l.hash ? { hash: l.hash } : {})} className="text-on-dark-muted hover:text-amber">
                   {l.label}
                 </Link>
               </li>
