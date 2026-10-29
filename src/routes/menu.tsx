@@ -10,8 +10,8 @@ const catIds = categories.map((c) => c.id) as string[];
 
 export const Route = createFileRoute("/menu")({
   validateSearch: (s: Record<string, unknown>): MenuSearch => ({
-    cat: typeof s.cat === "string" && catIds.includes(s.cat) ? (s.cat as CategoryId) : undefined,
-    item: typeof s.item === "string" ? s.item : undefined,
+    cat: typeof s["cat"] === "string" && catIds.includes(s["cat"]) ? (s["cat"] as CategoryId) : undefined,
+    item: typeof s["item"] === "string" ? s["item"] : undefined,
   }),
   head: () => ({
     meta: [

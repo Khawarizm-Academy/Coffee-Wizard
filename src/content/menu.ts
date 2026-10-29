@@ -30,7 +30,7 @@ export type MenuItem = {
   descriptionEn?: string;
   descriptionAr?: string;
   category: CategoryId;
-  temp?: "hot" | "iced";
+  temp?: "hot" | "iced" | undefined;
   /** Never displayed until priceStatus is "verified". */
   price?: number;
   currency: "EGP";

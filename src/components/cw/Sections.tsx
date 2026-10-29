@@ -207,7 +207,7 @@ export function BenefitsSection() {
         <p className="eyebrow text-center">{t.benefits.eyebrow}</p>
         <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {t.benefits.items.map((b, i) => {
-            const Icon = icons[i];
+            const Icon = icons[i] ?? Coffee;
             return (
               <div key={b.title} className="text-center">
                 <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-coffee text-coffee">
