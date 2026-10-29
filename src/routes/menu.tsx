@@ -5,7 +5,7 @@ import { useLang } from "@/lib/i18n";
 import { categories, menu, searchMenu, type CategoryId } from "@/content/menu";
 import { ProductCard, ProductDialog } from "@/components/cw/Product";
 
-type MenuSearch = { cat?: CategoryId; item?: string };
+type MenuSearch = { cat?: CategoryId | undefined; item?: string | undefined };
 const catIds = categories.map((c) => c.id) as string[];
 
 export const Route = createFileRoute("/menu")({
