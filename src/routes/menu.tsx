@@ -79,7 +79,7 @@ function MenuPage() {
       {results.length === 0 ? (
         <p className="py-20 text-center text-muted-foreground">{t.menu.empty}</p>
       ) : (
-        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-3 md:gap-5 lg:grid-cols-4">
           {results.map((m) => (
             <div key={m.id} id={`item-${m.id}`} className="relative">
               <ProductCard

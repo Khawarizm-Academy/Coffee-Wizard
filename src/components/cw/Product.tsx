@@ -37,7 +37,7 @@ export function ProductCard({ item, onOpen, linkToMenu }: { item: MenuItem; onOp
       </div>
       <div className="flex flex-1 flex-col gap-1.5 p-4 text-start">
         <span className="eyebrow !text-[0.65rem]">{lang === "ar" ? cat.nameAr : cat.nameEn}</span>
-        <h3 className="font-display text-lg font-semibold leading-snug" dir="auto">
+        <h3 className="font-display text-base font-semibold leading-snug md:text-lg" dir="auto">
           {item.nameEn}
         </h3>
         {lang === "ar" && item.nameAr && <p className="text-sm text-muted-foreground">{item.nameAr}</p>}
