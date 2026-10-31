@@ -1,5 +1,6 @@
 const en = {
   concept: "Concept website prepared for Coffee Wizard — not the official site.",
+  imageConcept: "Concept image",
   nav: {
     home: "Home",
     story: "Our Story",
@@ -101,7 +102,7 @@ const en = {
     eyebrow: "Hungarian-inspired bakery",
     title: "Something Special, Fresh from the Bakery.",
     body: "Chimney cakes, sweet and savoury, plus croissants and sandwiches to go with your cup.",
-    illustrative: "Illustrative photo — to be replaced with Coffee Wizard photography.",
+    illustrative: "AI-generated concept imagery — illustrative only, not actual café photography.",
     cta: "Browse the bakery",
   },
   benefits: {
@@ -166,9 +167,13 @@ const en = {
     total: "Total",
     totalPending: "Total unavailable until prices are confirmed",
     priceHelp: "Some selected prices are unconfirmed, so a total cannot be shown yet.",
-    emailHelp: "The café’s order email has not been configured yet.",
-    send: "Prepare email order",
-    sendNote: "This opens a pre-filled email in your email app for you to review and send.",
+    send: "Preview mock email",
+    sendNote: "Demo only — nothing is sent and no purchase is submitted.",
+    mockTitle: "Purchase email preview · Demo only",
+    mockNotice: "This is a local demo. No email is sent and no purchase is submitted.",
+    mockSubject: "Coffee Wizard purchase request (demo)",
+    mockIntro: "Items in this request",
+    closePreview: "Close preview",
   },
 };
 
@@ -176,6 +181,7 @@ export type Dict = typeof en;
 
 const ar: Dict = {
   concept: "موقع تجريبي مقترح لـ Coffee Wizard — مش الموقع الرسمي.",
+  imageConcept: "صورة توضيحية",
   nav: {
     home: "الرئيسية",
     story: "عن المكان",
@@ -272,7 +278,7 @@ const ar: Dict = {
     eyebrow: "مخبوزات مستوحاة من المجر",
     title: "مخبوزات مميزة تكمل تجربتك.",
     body: "Chimney Cake حلو وحادق، وكمان Croissant وساندوتشات تكمّل فنجانك.",
-    illustrative: "صورة توضيحية — هتتبدل بصور Coffee Wizard الحقيقية.",
+    illustrative: "صور توضيحية مولدة بالذكاء الاصطناعي، مش صور حقيقية للكافيه.",
     cta: "تصفّح المخبوزات",
   },
   benefits: {
@@ -334,9 +340,13 @@ const ar: Dict = {
     total: "الإجمالي",
     totalPending: "الإجمالي هيظهر بعد تأكيد الأسعار",
     priceHelp: "في أسعار مختارة لسه مش مؤكدة، فمش ممكن نعرض الإجمالي دلوقتي.",
-    emailHelp: "إيميل الطلبات بتاع الكافيه لسه مش متضاف.",
-    send: "جهّز إيميل الطلب",
-    sendNote: "ده هيفتح إيميل جاهز في تطبيق البريد عشان تراجعه وتبعته.",
+    send: "عاين الإيميل التجريبي",
+    sendNote: "تجربة بس — مفيش إيميل هيتبعت ومفيش طلب شراء هيتسجل.",
+    mockTitle: "معاينة إيميل الشراء · تجربة فقط",
+    mockNotice: "دي معاينة تجريبية على الصفحة بس. مفيش إيميل هيتبعت ومفيش طلب شراء هيتسجل.",
+    mockSubject: "طلب شراء Coffee Wizard (تجريبي)",
+    mockIntro: "الأصناف في الطلب التجريبي",
+    closePreview: "اقفل المعاينة",
   },
 };
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { MenuItem } from "@/content/menu";
-import { buildOrderMailto, summarizeOrder } from "@/lib/order";
+import { buildMockPurchasePreview, summarizeOrder } from "@/lib/order";
 
 const makeItem = (overrides: Partial<MenuItem> = {}): MenuItem => ({
   id: "latte",
@@ -40,14 +40,21 @@ describe("order summary", () => {
     expect(result.lines).toHaveLength(0);
     expect(result.total).toBeNull();
   });
+});
 
-  it("builds a percent-encoded email draft only for complete priced orders", () => {
-    const summary = summarizeOrder([makeItem()], { latte: 2 });
-    const href = buildOrderMailto("orders@example.com", summary.lines, summary.total!);
+describe("mock purchase preview", () => {
+  it("creates a local preview even when prices are unconfirmed without any email destination", () => {
+    const summary = summarizeOrder([makeItem({ priceStatus: "unconfirmed" })], { latte: 2 });
+    const preview = buildMockPurchasePreview(summary.lines, summary.total);
 
-    expect(href).toContain("mailto:orders@example.com");
-    expect(decodeURIComponent(href ?? "")).toContain("Latte x 2");
-    expect(buildOrderMailto("", summary.lines, summary.total!)).toBeNull();
-    expect(buildOrderMailto("orders@example.com", [], 0)).toBeNull();
+    expect(preview).toMatchObject({ kind: "mock", total: null, itemCount: 2 });
+    expect(preview?.lines[0]?.lineTotal).toBeNull();
+    expect(preview).not.toHaveProperty("email");
+    expect(preview).not.toHaveProperty("recipient");
+    expect(preview).not.toHaveProperty("href");
+  });
+
+  it("has no preview when the customer has not selected an item", () => {
+    expect(buildMockPurchasePreview([], null)).toBeNull();
   });
 });

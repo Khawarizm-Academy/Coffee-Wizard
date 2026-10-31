@@ -42,7 +42,7 @@ export function HeroSection() {
   return (
     <section className="relative isolate overflow-hidden bg-charcoal text-on-dark">
       <div className="absolute inset-0 -z-10">
-        <Photo img={images.syphonBar} eager />
+        <Photo img={images.hero} eager />
         <div className="hero-overlay absolute inset-0" />
       </div>
       <div className="container-cw relative flex min-h-[78vh] flex-col justify-center py-20 md:min-h-[86vh]">
@@ -197,7 +197,7 @@ export function SpecialtyCoffeeSection() {
 export function BakerySection() {
   const { t } = useLang();
   const tiles = [
-    { img: images.chimney, name: "Chimney Bites", id: "chimney-bites" },
+    { img: images.bakeryPairing, name: "Chimney Bites", id: "chimney-bites" },
     { img: images.savoury, name: "Zaatar Labneh Chimney", id: "zaatar-labneh-chimney" },
     { img: images.croissants, name: "Croissants & Pain Suisse", id: "sweet-croissants" },
   ];

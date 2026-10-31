@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Sparkles as SparklesIcon } from "lucide-react";
 import { useLang } from "@/lib/i18n";
 
 /** Fades + lifts children in the first time they scroll into view. */
@@ -44,15 +45,12 @@ export function Reveal({
 /** Four-point wizard sparkle. */
 export function Sparkle({ className = "", style }: { className?: string; style?: CSSProperties }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
+    <SparklesIcon
       aria-hidden="true"
       className={`animate-twinkle ${className}`}
       style={style}
-      fill="currentColor"
-    >
-      <path d="M12 0c.6 5.4 2.6 8.6 6 10.2 1.6.8 3.6 1.4 6 1.8-5.4.6-8.6 2.6-10.2 6-.8 1.6-1.4 3.6-1.8 6-.6-5.4-2.6-8.6-6-10.2C4.4 13 2.4 12.4 0 12c5.4-.6 8.6-2.6 10.2-6 .8-1.6 1.4-3.6 1.8-6z" />
-    </svg>
+      strokeWidth={1.75}
+    />
   );
 }
 

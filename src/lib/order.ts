@@ -6,6 +6,13 @@ export type OrderLine = {
   lineTotal: number | null;
 };
 
+export type MockPurchasePreview = {
+  kind: "mock";
+  lines: readonly OrderLine[];
+  total: number | null;
+  itemCount: number;
+};
+
 export function summarizeOrder(menuItems: readonly MenuItem[], quantities: Record<string, number>) {
   const lines: OrderLine[] = menuItems.flatMap((item) => {
     const quantity = Math.max(0, Math.floor(quantities[item.id] ?? 0));
@@ -23,19 +30,16 @@ export function summarizeOrder(menuItems: readonly MenuItem[], quantities: Recor
   return { lines, total, unpricedCount };
 }
 
-export function buildOrderMailto(email: string, lines: OrderLine[], total: number): string | null {
-  const recipient = email.trim();
-  if (!recipient || lines.length === 0 || lines.some((line) => line.lineTotal === null))
-    return null;
-
-  const body = [
-    "Hello Coffee Wizard,",
-    "",
-    "I would like to place this order:",
-    ...lines.map((line) => `- ${line.item.nameEn} x ${line.quantity} — EGP ${line.lineTotal}`),
-    "",
-    `Total: EGP ${total}`,
-  ].join("\n");
-
-  return `mailto:${recipient}?subject=${encodeURIComponent("Coffee Wizard order")}&body=${encodeURIComponent(body)}`;
+/** Build a local display model only; this function never constructs an email or sends an order. */
+export function buildMockPurchasePreview(
+  lines: readonly OrderLine[],
+  total: number | null,
+): MockPurchasePreview | null {
+  if (lines.length === 0) return null;
+  return {
+    kind: "mock",
+    lines: [...lines],
+    total,
+    itemCount: lines.reduce((count, line) => count + line.quantity, 0),
+  };
 }

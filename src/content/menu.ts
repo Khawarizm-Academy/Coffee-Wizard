@@ -13,13 +13,23 @@ export type CategoryId =
 export type Category = { id: CategoryId; nameEn: string; nameAr: string; image: Img };
 
 export const categories: Category[] = [
-  { id: "hot-coffee", nameEn: "Hot Coffee", nameAr: "قهوة سخنة", image: images.barista },
+  { id: "hot-coffee", nameEn: "Hot Coffee", nameAr: "قهوة سخنة", image: images.signatureLatte },
   { id: "pour-over", nameEn: "Pour Over", nameAr: "Pour Over", image: images.pourOver },
-  { id: "iced-coffee", nameEn: "Iced Coffee", nameAr: "قهوة ساقعة", image: images.wizardCup },
+  { id: "iced-coffee", nameEn: "Iced Coffee", nameAr: "قهوة ساقعة", image: images.icedPistachio },
   { id: "matcha", nameEn: "Matcha", nameAr: "ماتشا", image: images.matchaCup },
-  { id: "signature", nameEn: "Signature & Blends", nameAr: "سيجنتشر وبليندز", image: images.slowBrew },
+  {
+    id: "signature",
+    nameEn: "Signature & Blends",
+    nameAr: "سيجنتشر وبليندز",
+    image: images.icedPistachio,
+  },
   { id: "non-coffee", nameEn: "Non-Coffee", nameAr: "من غير قهوة", image: images.retail },
-  { id: "bakery", nameEn: "Chimney & Bakery", nameAr: "Chimney ومخبوزات", image: images.chimney },
+  {
+    id: "bakery",
+    nameEn: "Chimney & Bakery",
+    nameAr: "Chimney ومخبوزات",
+    image: images.bakeryPairing,
+  },
   { id: "sandwiches", nameEn: "Sandwiches", nameAr: "ساندوتشات", image: images.savoury },
 ];
 
@@ -46,7 +56,12 @@ const BOARD = "In-store menu board photo (date unknown)";
 const BRIEF = "Client brief research checklist";
 
 type Seed = [id: string, nameEn: string, extra?: Partial<MenuItem>];
-const make = (category: CategoryId, temp: MenuItem["temp"], source: string, seeds: Seed[]): MenuItem[] =>
+const make = (
+  category: CategoryId,
+  temp: MenuItem["temp"],
+  source: string,
+  seeds: Seed[],
+): MenuItem[] =>
   seeds.map(([id, nameEn, extra]) => ({
     id,
     nameEn,
@@ -72,33 +87,62 @@ export const menu: MenuItem[] = [
     ["caramel-macchiato", "Caramel Macchiato", { price: 70 }],
     ["mocha", "Mocha", { price: 75 }],
     ["white-mocha", "White Mocha", { price: 75 }],
-    ["spanish-latte", "Spanish Latte", {
-      price: 70, featured: true, image: images.barista,
-      descriptionEn: "Espresso with milk, sweetened the Spanish way.",
-      descriptionAr: "إسبريسو باللبن بطعم Spanish المسكّر.",
-    }],
-    ["pistachio-spanish-latte", "Pistachio Spanish Latte", {
-      source: BRIEF, featured: true, image: images.counter,
-      descriptionEn: "The Spanish Latte with a pistachio twist.",
-      descriptionAr: "الـ Spanish Latte بلمسة فستق.",
-    }],
+    [
+      "spanish-latte",
+      "Spanish Latte",
+      {
+        price: 70,
+        featured: true,
+        image: images.signatureLatte,
+        descriptionEn: "Espresso with milk, sweetened the Spanish way.",
+        descriptionAr: "إسبريسو باللبن بطعم Spanish المسكّر.",
+      },
+    ],
+    [
+      "pistachio-spanish-latte",
+      "Pistachio Spanish Latte",
+      {
+        source: BRIEF,
+        featured: true,
+        image: images.signatureLatte,
+        descriptionEn: "The Spanish Latte with a pistachio twist.",
+        descriptionAr: "الـ Spanish Latte بلمسة فستق.",
+      },
+    ],
     ["lotus-latte", "Lotus Latte", { price: 78 }],
     ["turkish-coffee", "Turkish Coffee", { nameAr: "قهوة تركي", price: 43 }],
     ["turkish-coffee-milk", "Turkish Coffee with Milk", { nameAr: "قهوة تركي باللبن", price: 52 }],
   ]),
   ...make("pour-over", "hot", BRIEF, [
-    ["v60", "V60", {
-      featured: true, image: images.pourOver,
-      descriptionEn: "Hand-poured filter coffee, clean and bright.",
-      descriptionAr: "قهوة فلتر بتتصب بالإيد، طعمها صافي وواضح.",
-    }],
-    ["chemex", "Chemex", {
-      featured: true, image: images.syphonBar,
-      descriptionEn: "A larger, smooth pour over — made for sharing.",
-      descriptionAr: "Pour Over ناعم وأكبر — ينفع تتشاركه.",
-    }],
+    [
+      "v60",
+      "V60",
+      {
+        featured: true,
+        image: images.pourOver,
+        descriptionEn: "Hand-poured filter coffee, clean and bright.",
+        descriptionAr: "قهوة فلتر بتتصب بالإيد، طعمها صافي وواضح.",
+      },
+    ],
+    [
+      "chemex",
+      "Chemex",
+      {
+        featured: true,
+        image: images.syphonBar,
+        descriptionEn: "A larger, smooth pour over — made for sharing.",
+        descriptionAr: "Pour Over ناعم وأكبر — ينفع تتشاركه.",
+      },
+    ],
     ["aeropress", "AeroPress"],
-    ["syphon", "Syphon", { descriptionEn: "Vacuum-brewed at the bar.", descriptionAr: "بيتحضّر بالـ Vacuum قدامك على البار." }],
+    [
+      "syphon",
+      "Syphon",
+      {
+        descriptionEn: "Vacuum-brewed at the bar.",
+        descriptionAr: "بيتحضّر بالـ Vacuum قدامك على البار.",
+      },
+    ],
     ["french-press", "French Press"],
   ]),
   ...make("iced-coffee", "iced", BOARD, [
@@ -109,8 +153,17 @@ export const menu: MenuItem[] = [
     ["iced-caramel-macchiato", "Iced Caramel Macchiato", { price: 66 }],
     ["iced-mocha", "Iced Mocha", { price: 74 }],
     ["iced-white-mocha", "Iced White Mocha", { price: 74 }],
-    ["iced-spanish-latte", "Iced Spanish Latte", { source: BRIEF, featured: true, image: images.wizardCup,
-      descriptionEn: "Our Spanish Latte, poured over ice.", descriptionAr: "الـ Spanish Latte على تلج." }],
+    [
+      "iced-spanish-latte",
+      "Iced Spanish Latte",
+      {
+        source: BRIEF,
+        featured: true,
+        image: images.icedPistachio,
+        descriptionEn: "Our Spanish Latte, poured over ice.",
+        descriptionAr: "الـ Spanish Latte على تلج.",
+      },
+    ],
     ["iced-pistachio-spanish-latte", "Iced Pistachio Spanish Latte", { source: BRIEF }],
   ]),
   ...make("signature", "iced", BRIEF, [
@@ -130,14 +183,31 @@ export const menu: MenuItem[] = [
     ["matcha-vanilla-latte", "Matcha Vanilla Latte"],
     ["matcha-spanish-latte", "Matcha Spanish Latte"],
     ["white-matcha", "White Matcha"],
-    ["matcha-pistachio", "Matcha Pistachio", { featured: true, image: images.hatWall,
-      descriptionEn: "Earthy matcha meets pistachio.", descriptionAr: "ماتشا مع فستق." }],
+    [
+      "matcha-pistachio",
+      "Matcha Pistachio",
+      {
+        featured: true,
+        image: images.matchaCup,
+        descriptionEn: "Earthy matcha meets pistachio.",
+        descriptionAr: "ماتشا مع فستق.",
+      },
+    ],
     ["matcha-coconut", "Matcha Coconut"],
     ["choco-matcha", "Choco Matcha"],
     ["espresso-matcha", "Espresso Matcha"],
     ["matcha-cloud", "Matcha Cloud"],
-    ["matcha-strawberry", "Matcha Strawberry", { temp: "iced", featured: true, image: images.matchaCup,
-      descriptionEn: "Layered matcha over a berry base.", descriptionAr: "ماتشا متطبّقة فوق فراولة." }],
+    [
+      "matcha-strawberry",
+      "Matcha Strawberry",
+      {
+        temp: "iced",
+        featured: true,
+        image: images.matchaCup,
+        descriptionEn: "Layered matcha over a berry base.",
+        descriptionAr: "ماتشا متطبّقة فوق فراولة.",
+      },
+    ],
     ["matcha-tropical", "Matcha Tropical"],
   ]),
   ...make("non-coffee", undefined, BOARD, [
@@ -156,11 +226,27 @@ export const menu: MenuItem[] = [
     ["strawberry-blend", "Strawberry Blend", { temp: "iced", price: 55 }],
   ]),
   ...make("bakery", undefined, BRIEF, [
-    ["chimney-bites", "Chimney Bites", { featured: true, image: images.chimney,
-      descriptionEn: "Bite-size Hungarian-style chimney cake.", descriptionAr: "Chimney Cake مجري في قطع صغيرة." }],
+    [
+      "chimney-bites",
+      "Chimney Bites",
+      {
+        featured: true,
+        image: images.bakeryPairing,
+        descriptionEn: "Bite-size Hungarian-style chimney cake.",
+        descriptionAr: "Chimney Cake مجري في قطع صغيرة.",
+      },
+    ],
     ["sweet-chimney", "Sweet Chimney"],
-    ["zaatar-labneh-chimney", "Zaatar Labneh Chimney", { featured: true, image: images.savoury,
-      descriptionEn: "A savoury chimney with zaatar and labneh.", descriptionAr: "Chimney حادق بالزعتر واللبنة." }],
+    [
+      "zaatar-labneh-chimney",
+      "Zaatar Labneh Chimney",
+      {
+        featured: true,
+        image: images.savoury,
+        descriptionEn: "A savoury chimney with zaatar and labneh.",
+        descriptionAr: "Chimney حادق بالزعتر واللبنة.",
+      },
+    ],
     ["turkey-salami-chimney", "Turkey Salami Chimney"],
     ["smoked-turkey-chimney", "Smoked Turkey Chimney"],
     ["fajita-hotdog-chimney", "Fajita Hotdog Chimney"],

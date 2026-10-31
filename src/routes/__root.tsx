@@ -81,14 +81,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Coffee Wizard — Specialty Coffee, Mansoura" },
-      { name: "description", content: "Concept website for Coffee Wizard, a specialty coffee and bakery café in Mansoura, Egypt." },
+      {
+        name: "description",
+        content:
+          "Concept website for Coffee Wizard, a specialty coffee and bakery café in Mansoura, Egypt.",
+      },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/brand/coffee-wizard-logo-seal.jpg", type: "image/jpeg" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

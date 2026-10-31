@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Minus, Plus, Search, Send, ShoppingBag } from "lucide-react";
+import { Mail, Minus, Plus, Search, ShoppingBag, X } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useLang } from "@/lib/i18n";
-import { business } from "@/content/business";
-import { categories, menu, type CategoryId, type MenuItem } from "@/content/menu";
-import { buildOrderMailto, summarizeOrder } from "@/lib/order";
 import { Reveal } from "@/components/cw/Motion";
+import { Photo } from "@/components/cw/Product";
+import { categories, itemImage, menu, type CategoryId, type MenuItem } from "@/content/menu";
+import { useLang } from "@/lib/i18n";
+import { buildMockPurchasePreview, summarizeOrder } from "@/lib/order";
 
 const drinkCategoryIds: CategoryId[] = [
   "hot-coffee",
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/order")({
       {
         name: "description",
         content:
-          "Choose drinks from the Coffee Wizard menu, adjust quantities, and prepare an email order.",
+          "Choose drinks from the Coffee Wizard menu, adjust quantities, and preview a local demo email. Nothing is submitted or sent.",
       },
       { property: "og:title", content: "Order from Coffee Wizard" },
       { property: "og:type", content: "website" },
@@ -44,6 +44,7 @@ function OrderPage() {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<CategoryId | "all">("all");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [showPreview, setShowPreview] = useState(false);
 
   const filteredDrinks = useMemo(() => {
     const search = query.trim().toLocaleLowerCase();
@@ -58,10 +59,10 @@ function OrderPage() {
   }, [activeCategory, query]);
 
   const summary = useMemo(() => summarizeOrder(drinks, quantities), [quantities]);
-  const mailto =
-    summary.total === null
-      ? null
-      : buildOrderMailto(business.orderEmail, summary.lines, summary.total);
+  const preview = useMemo(
+    () => buildMockPurchasePreview(summary.lines, summary.total),
+    [summary.lines, summary.total],
+  );
   const itemCount = summary.lines.reduce((sum, line) => sum + line.quantity, 0);
   const money = (amount: number) =>
     new Intl.NumberFormat("en-EG", {
@@ -71,6 +72,7 @@ function OrderPage() {
     }).format(amount);
 
   function adjust(itemId: string, amount: number) {
+    setShowPreview(false);
     setQuantities((current) => {
       const nextQuantity = Math.max(0, (current[itemId] ?? 0) + amount);
       const next = { ...current };
@@ -94,27 +96,29 @@ function OrderPage() {
         <section aria-label={o.allDrinks}>
           <label className="relative block max-w-xl">
             <span className="sr-only">{o.search}</span>
-            <Search className="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search
+              className="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden="true"
+            />
             <input
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={o.search}
-              className="w-full rounded-full border border-input bg-card py-3 ps-11 pe-4 text-sm focus:border-ring focus:outline-none"
+              className="w-full rounded-full border border-input bg-card py-3 ps-11 pe-4 text-sm focus:border-ring focus:outline-none focus-visible:ring-2 focus-visible:ring-amber"
             />
           </label>
 
           <div
             className="mt-4 flex gap-2 overflow-x-auto pb-2"
-            role="tablist"
+            role="group"
             aria-label={o.allDrinks}
           >
             <button
               type="button"
-              role="tab"
-              aria-selected={activeCategory === "all"}
+              aria-pressed={activeCategory === "all"}
               onClick={() => setActiveCategory("all")}
-              className={`shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${activeCategory === "all" ? "border-charcoal bg-charcoal text-cream" : "border-border hover:border-charcoal"}`}
+              className="cw-chip shrink-0 px-4 py-2 text-sm font-semibold"
             >
               {o.allDrinks}
             </button>
@@ -122,10 +126,9 @@ function OrderPage() {
               <button
                 key={category.id}
                 type="button"
-                role="tab"
-                aria-selected={activeCategory === category.id}
+                aria-pressed={activeCategory === category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className={`shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${activeCategory === category.id ? "border-charcoal bg-charcoal text-cream" : "border-border hover:border-charcoal"}`}
+                className="cw-chip shrink-0 px-4 py-2 text-sm font-semibold"
               >
                 {lang === "ar" ? category.nameAr : category.nameEn}
               </button>
@@ -135,84 +138,100 @@ function OrderPage() {
           {filteredDrinks.length === 0 ? (
             <p className="py-16 text-center text-muted-foreground">{o.empty}</p>
           ) : (
-            <Reveal delay={80} className="mt-5 grid gap-3 sm:grid-cols-2">
-              {filteredDrinks.map((item) => {
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {filteredDrinks.map((item, index) => {
                 const quantity = quantities[item.id] ?? 0;
                 const verifiedPrice =
                   item.priceStatus === "verified" && typeof item.price === "number";
+                const img = itemImage(item);
+                const categoryName =
+                  lang === "ar"
+                    ? categories.find((category) => category.id === item.category)?.nameAr
+                    : categories.find((category) => category.id === item.category)?.nameEn;
                 return (
-                  <article
-                    key={item.id}
-                    className="flex min-h-32 flex-col justify-between rounded-xl border border-border bg-card p-4 shadow-card"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="eyebrow !text-[0.65rem]">
-                          {lang === "ar"
-                            ? categories.find((category) => category.id === item.category)?.nameAr
-                            : categories.find((category) => category.id === item.category)?.nameEn}
-                        </p>
-                        <h2 className="font-display mt-1 text-lg font-semibold" dir="auto">
-                          {itemName(item, lang)}
-                        </h2>
+                  <Reveal key={item.id} delay={(index % 4) * 45}>
+                    <article className="cw-card flex min-h-36 overflow-hidden">
+                      <div className="relative w-28 shrink-0 bg-charcoal sm:w-32">
+                        <Photo img={img} />
                       </div>
-                      <span className="shrink-0 text-end text-sm font-semibold" dir="ltr">
-                        {verifiedPrice ? (
-                          money(item.price!)
-                        ) : (
+                      <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 p-3 sm:p-4">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="eyebrow !text-[0.6rem]">{categoryName}</p>
+                            <h2
+                              className="font-display mt-1 text-base font-semibold leading-snug sm:text-lg"
+                              dir="auto"
+                            >
+                              {itemName(item, lang)}
+                            </h2>
+                            {lang === "ar" && item.nameAr && (
+                              <p className="text-xs text-muted-foreground" dir="ltr">
+                                {item.nameEn}
+                              </p>
+                            )}
+                          </div>
                           <span
-                            className="text-xs font-normal text-muted-foreground"
-                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            className="shrink-0 text-end text-xs font-semibold sm:text-sm"
+                            dir="ltr"
                           >
-                            {o.pricePending}
+                            {verifiedPrice ? (
+                              money(item.price!)
+                            ) : (
+                              <span
+                                className="font-normal text-muted-foreground"
+                                dir={lang === "ar" ? "rtl" : "ltr"}
+                              >
+                                {o.pricePending}
+                              </span>
+                            )}
                           </span>
-                        )}
-                      </span>
-                    </div>
-                    <div className="mt-4 flex items-center justify-between gap-3">
-                      <span className="text-xs text-muted-foreground">{o.quantity}</span>
-                      <div className="inline-flex items-center gap-3 rounded-full border border-border px-2 py-1">
-                        <button
-                          type="button"
-                          onClick={() => adjust(item.id, -1)}
-                          disabled={quantity === 0}
-                          aria-label={`${o.removeOne}: ${itemName(item, lang)}`}
-                          className="rounded-full p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:opacity-30"
-                        >
-                          <Minus className="h-4 w-4" />
-                        </button>
-                        <output
-                          className="min-w-5 text-center text-sm font-bold"
-                          aria-live="polite"
-                        >
-                          {quantity}
-                        </output>
-                        <button
-                          type="button"
-                          onClick={() => adjust(item.id, 1)}
-                          aria-label={`${o.addOne}: ${itemName(item, lang)}`}
-                          className="rounded-full p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                        >
-                          <Plus className="h-4 w-4" />
-                        </button>
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs text-muted-foreground">{o.quantity}</span>
+                          <div className="inline-flex items-center gap-2 rounded-full border border-border px-2 py-1">
+                            <button
+                              type="button"
+                              onClick={() => adjust(item.id, -1)}
+                              disabled={quantity === 0}
+                              aria-label={`${o.removeOne}: ${itemName(item, lang)}`}
+                              className="rounded-full p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:opacity-30"
+                            >
+                              <Minus className="h-4 w-4" aria-hidden="true" />
+                            </button>
+                            <output
+                              className="min-w-5 text-center text-sm font-bold"
+                              aria-live="polite"
+                            >
+                              {quantity}
+                            </output>
+                            <button
+                              type="button"
+                              onClick={() => adjust(item.id, 1)}
+                              aria-label={`${o.addOne}: ${itemName(item, lang)}`}
+                              className="rounded-full p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                            >
+                              <Plus className="h-4 w-4" aria-hidden="true" />
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </article>
+                    </article>
+                  </Reveal>
                 );
               })}
-            </Reveal>
+            </div>
           )}
         </section>
 
         <aside
-          className="h-fit rounded-xl border border-border bg-charcoal p-5 text-on-dark shadow-card lg:sticky lg:top-28 md:p-6"
+          className="cw-card-dark h-fit p-5 lg:sticky lg:top-28 md:p-6"
           aria-labelledby="order-summary-title"
         >
           <h2
             id="order-summary-title"
             className="font-display flex items-center gap-2 text-2xl font-bold"
           >
-            <ShoppingBag className="h-5 w-5 text-amber" /> {o.summary}
+            <ShoppingBag className="h-5 w-5 text-amber" aria-hidden="true" /> {o.summary}
           </h2>
           {summary.lines.length === 0 ? (
             <p className="mt-5 text-sm text-on-dark-muted">{o.summaryEmpty}</p>
@@ -236,17 +255,18 @@ function OrderPage() {
           <div className="mt-4 border-t border-line-dark pt-4">
             <div className="flex items-start justify-between gap-4">
               <span className="font-semibold">{o.total}</span>
-              <span className="text-end font-display text-lg font-bold" dir="ltr">
-                {summary.total === null ? "—" : money(summary.total)}
+              <span className="text-end font-display text-sm font-bold sm:text-base" dir="auto">
+                {summary.total === null ? (
+                  o.totalPending
+                ) : (
+                  <span dir="ltr">{money(summary.total)}</span>
+                )}
               </span>
             </div>
-            <p className="mt-2 text-xs text-on-dark-muted">
-              {summary.unpricedCount > 0
-                ? o.priceHelp
-                : !business.orderEmail
-                  ? o.emailHelp
-                  : o.sendNote}
-            </p>
+            {summary.unpricedCount > 0 && (
+              <p className="mt-2 text-xs text-on-dark-muted">{o.priceHelp}</p>
+            )}
+            <p className="mt-2 text-xs text-on-dark-muted">{o.sendNote}</p>
             {itemCount > 0 && (
               <p className="mt-2 text-xs text-on-dark-muted" dir="auto">
                 {itemCount} {o.selectedCount}
@@ -255,12 +275,69 @@ function OrderPage() {
           </div>
           <button
             type="button"
-            disabled={!mailto}
-            onClick={() => mailto && window.location.assign(mailto)}
-            className="btn-amber mt-5 w-full disabled:cursor-not-allowed"
+            disabled={!preview}
+            aria-expanded={showPreview}
+            aria-controls={preview ? "mock-order-preview" : undefined}
+            onClick={() => setShowPreview((visible) => !visible)}
+            className="btn-amber mt-5 w-full disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Send className="h-4 w-4" /> {o.send}
+            <Mail className="h-4 w-4" aria-hidden="true" /> {o.send}
           </button>
+
+          {preview && (
+            <div
+              id="mock-order-preview"
+              className="cw-card mt-4 p-4 text-foreground"
+              hidden={!showPreview}
+              role="region"
+              aria-label={o.mockTitle}
+              aria-live="polite"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-display text-lg font-bold">{o.mockTitle}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">{o.mockNotice}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPreview(false)}
+                  aria-label={o.closePreview}
+                  className="rounded-full p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                >
+                  <X className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
+              <p
+                className="mt-4 rounded-lg bg-cream-deep px-3 py-2 text-sm font-semibold"
+                dir="auto"
+              >
+                {o.mockSubject}
+              </p>
+              <p className="eyebrow mt-4 !text-[0.65rem]">{o.mockIntro}</p>
+              <ul className="mt-2 space-y-2 text-sm">
+                {preview.lines.map((line) => (
+                  <li key={line.item.id} className="flex justify-between gap-3">
+                    <span dir="auto">
+                      {itemName(line.item, lang)} × {line.quantity}
+                    </span>
+                    <span className="shrink-0 text-end" dir="ltr">
+                      {line.lineTotal === null ? o.pricePending : money(line.lineTotal)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-3 flex justify-between gap-3 border-t border-border pt-3 text-sm font-bold">
+                <span>{o.total}</span>
+                <span className="text-end" dir="auto">
+                  {preview.total === null ? (
+                    o.totalPending
+                  ) : (
+                    <span dir="ltr">{money(preview.total)}</span>
+                  )}
+                </span>
+              </div>
+            </div>
+          )}
         </aside>
       </div>
     </div>

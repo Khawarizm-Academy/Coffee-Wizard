@@ -125,7 +125,7 @@ export function Footer() {
     <footer className="bg-charcoal text-on-dark">
       <div className="container-cw grid gap-10 py-14 md:grid-cols-3">
         <div className="space-y-4">
-          <Logo />
+          <Logo variant="primary" className="h-20 w-20 rounded-xl" />
           <p className="max-w-xs text-sm text-on-dark-muted">{t.footer.about}</p>
           <LanguageSwitcher />
         </div>

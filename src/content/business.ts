@@ -3,7 +3,6 @@ export const business = {
   name: "Coffee Wizard",
   phoneDisplay: "+20 10 08180137",
   phoneHref: "tel:+201008180137",
-  orderEmail: "", // Set when the café provides its order email address.
   mapsUrl: "https://www.google.com/maps/search/?api=1&query=Coffee+Wizard+El+Gomhouria+Mansoura",
   instagram: "https://www.instagram.com/coffeewizardeg/",
   talabat: "https://www.talabat.com/egypt/restaurant/746443/coffee-wizard-el-gomhorya-street",

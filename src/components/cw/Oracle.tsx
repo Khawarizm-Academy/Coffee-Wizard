@@ -1,24 +1,50 @@
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, RotateCcw, Wand2 } from "lucide-react";
+import {
+  ArrowRight,
+  Bean,
+  Candy,
+  Cherry,
+  Cloud,
+  Coffee,
+  Cookie,
+  Croissant,
+  Flame,
+  GlassWater,
+  Leaf,
+  Milk,
+  Nut,
+  RotateCcw,
+  Sparkles,
+  Wand2,
+  type LucideIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
+import { images } from "@/content/images";
+import { categoryById, itemImage, menu, type MenuItem } from "@/content/menu";
 import { useLang } from "@/lib/i18n";
-import { menu, itemImage, categoryById } from "@/content/menu";
 import { FLAVORS, MAX_NOTE, type Flavor, type OracleResult, type TempPref } from "@/lib/oracle";
 import { askWizard } from "@/lib/oracle.functions";
 import { Photo } from "./Product";
-import { Reveal, Sparkle, SparkleField, SpinBadge, Steam } from "./Motion";
+import { Reveal, Sparkle, SpinBadge, Steam } from "./Motion";
 
-const EMOJI: Record<Flavor, string> = {
-  sweet: "🍯",
-  nutty: "🥜",
-  chocolatey: "🍫",
-  fruity: "🍓",
-  strong: "⚡",
-  creamy: "🥛",
-  light: "☁️",
-  earthy: "🍵",
+const FLAVOR_ICONS: Record<Flavor, LucideIcon> = {
+  sweet: Candy,
+  nutty: Nut,
+  chocolatey: Cookie,
+  fruity: Cherry,
+  strong: Flame,
+  creamy: Milk,
+  light: Cloud,
+  earthy: Leaf,
 };
+
+const TEMP_ICONS: Record<TempPref, LucideIcon> = {
+  hot: Coffee,
+  iced: GlassWater,
+  any: Sparkles,
+};
+
 type ErrCode = "credits" | "busy" | "config" | "refused" | "empty" | "failed";
 
 function Cauldron({ line }: { line: string }) {
@@ -28,26 +54,19 @@ function Cauldron({ line }: { line: string }) {
       role="status"
       aria-live="polite"
     >
-      <div className="relative h-28 w-28">
-        {[0, 0.4, 0.8, 1.2].map((d, i) => (
+      <div className="relative flex h-28 w-28 items-center justify-center">
+        {[0, 0.4, 0.8, 1.2].map((delay, index) => (
           <span
-            key={d}
+            key={delay}
             className="absolute bottom-16 h-3 w-3 animate-bubble rounded-full bg-amber"
-            style={{ left: `${28 + i * 14}%`, animationDelay: `${d}s` }}
+            style={{ left: `${28 + index * 14}%`, animationDelay: `${delay}s` }}
           />
         ))}
-        <svg
-          viewBox="0 0 64 64"
-          className="absolute bottom-0 h-20 w-28 text-amber"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path d="M6 22h52l-4 26a10 10 0 0 1-10 8H20a10 10 0 0 1-10-8z" opacity=".9" />
-          <path d="M58 26h2a6 6 0 0 1 0 12h-3" fill="none" stroke="currentColor" strokeWidth="3" />
-          <ellipse cx="32" cy="22" rx="26" ry="5" className="text-coffee" fill="currentColor" />
-        </svg>
+        <span className="cw-icon-tile h-20 w-20 bg-amber/10 text-amber shadow-glow">
+          <Coffee className="h-12 w-12" strokeWidth={1.7} aria-hidden="true" />
+        </span>
       </div>
-      <p key={line} className="font-display animate-pop text-xl font-semibold text-on-dark">
+      <p key={line} className="font-display animate-pop text-xl font-semibold text-foreground">
         {line}
       </p>
     </div>
@@ -68,12 +87,16 @@ export function WizardOracle() {
 
   useEffect(() => {
     if (status !== "loading") return;
-    const id = setInterval(() => setLineIdx((i) => (i + 1) % o.loading.length), 1500);
+    const id = setInterval(() => setLineIdx((index) => (index + 1) % o.loading.length), 1500);
     return () => clearInterval(id);
   }, [status, o.loading.length]);
 
-  const toggle = (f: Flavor) =>
-    setFlavors((cur) => (cur.includes(f) ? cur.filter((x) => x !== f) : [...cur, f]));
+  const toggle = (flavor: Flavor) =>
+    setFlavors((current) =>
+      current.includes(flavor)
+        ? current.filter((selected) => selected !== flavor)
+        : [...current, flavor],
+    );
 
   async function cast() {
     if (flavors.length === 0 && !note.trim()) return setError(o.needInput);
@@ -81,12 +104,12 @@ export function WizardOracle() {
     setStatus("loading");
     setLineIdx(0);
     try {
-      const res = await ask({ data: { flavors, temp, note, lang } });
-      if (res.ok) {
-        setResult(res.result);
+      const response = await ask({ data: { flavors, temp, note, lang } });
+      if (response.ok) {
+        setResult(response.result);
         setStatus("done");
       } else {
-        setError(o.errors[res.code as ErrCode] ?? o.errors.failed);
+        setError(o.errors[response.code as ErrCode] ?? o.errors.failed);
         setStatus("idle");
       }
     } catch {
@@ -95,28 +118,25 @@ export function WizardOracle() {
     }
   }
 
-  const byId = (id: string) => menu.find((m) => m.id === id);
+  const byId = (id: string) => menu.find((item) => item.id === id);
+  const itemName = (item: MenuItem) => (lang === "ar" && item.nameAr ? item.nameAr : item.nameEn);
+  const pairing = result?.pairing ? byId(result.pairing.id) : undefined;
 
   return (
-    <section
-      id="oracle"
-      className="bg-tiles relative isolate overflow-hidden py-20 text-on-dark md:py-28"
-    >
-      <SparkleField />
-      <div
-        aria-hidden="true"
-        className="absolute -end-24 -top-24 -z-10 h-80 w-80 rounded-full bg-lavender/20 blur-3xl"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute -bottom-24 -start-24 -z-10 h-80 w-80 rounded-full bg-amber/15 blur-3xl"
-      />
+    <section id="oracle" className="bg-cream-deep py-20 md:py-28">
       <div className="container-cw">
-        <Reveal className="relative overflow-hidden rounded-xl border border-line-dark bg-charcoal-soft/70 p-6 shadow-card backdrop-blur md:p-8">
-          <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <Reveal className="cw-card-dark relative overflow-hidden p-5 md:p-8">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -end-20 -top-24 h-72 w-72 rounded-full bg-lavender/15 blur-3xl"
+          />
+          <div className="relative z-10 grid items-center gap-7 md:grid-cols-[1.1fr_0.9fr]">
             <div className="max-w-2xl">
               <p className="eyebrow inline-flex items-center gap-2 !text-amber">
-                <Wand2 className="h-4 w-4 animate-wiggle [animation-iteration-count:infinite] [animation-duration:2.4s]" />{" "}
+                <Wand2
+                  className="h-4 w-4 animate-wiggle [animation-iteration-count:infinite] [animation-duration:2.4s]"
+                  aria-hidden="true"
+                />
                 {o.eyebrow}
               </p>
               <h2 className="font-display mt-3 text-3xl font-bold leading-tight md:text-5xl">
@@ -124,24 +144,25 @@ export function WizardOracle() {
               </h2>
               <p className="mt-5 text-on-dark-muted">{o.body}</p>
             </div>
-            <SpinBadge
-              text={o.badge}
-              className="h-20 w-20 shrink-0 self-center text-amber sm:h-28 sm:w-28"
-            />
+            <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-line-dark bg-charcoal">
+              <Photo img={images.flavorBoard} />
+              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/75 via-transparent to-charcoal/10" />
+              <SpinBadge
+                text={o.badge}
+                className="absolute end-3 top-3 h-20 w-20 rounded-full bg-charcoal/70 p-1 text-amber shadow-card sm:h-24 sm:w-24"
+              />
+            </div>
           </div>
         </Reveal>
 
-        <Reveal
-          delay={120}
-          className="mt-10 rounded-xl border border-line-dark bg-charcoal-soft/80 p-5 shadow-card backdrop-blur md:p-8"
-        >
+        <Reveal delay={120} className="cw-card mt-8 p-5 md:p-8">
           {status === "loading" ? (
             <Cauldron line={o.loading[lineIdx] ?? ""} />
           ) : status === "done" && result ? (
-            <div>
+            <div aria-live="polite">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <p className="eyebrow !text-amber">{o.results}</p>
+                  <p className="eyebrow">{o.results}</p>
                   {result.intro && (
                     <p className="font-display mt-2 max-w-2xl text-xl md:text-2xl" dir="auto">
                       {result.intro}
@@ -151,118 +172,115 @@ export function WizardOracle() {
                 <button
                   type="button"
                   onClick={() => setStatus("idle")}
-                  className="btn-ghost-light !py-2 text-sm"
+                  className="btn-outline-dark !py-2 text-sm"
                 >
-                  <RotateCcw className="h-4 w-4" /> {o.again}
+                  <RotateCcw className="h-4 w-4" aria-hidden="true" /> {o.again}
                 </button>
               </div>
               <div className="mt-8 grid gap-4 md:grid-cols-3">
-                {result.picks.map((p, i) => {
-                  const m = byId(p.id);
-                  if (!m) return null;
+                {result.picks.map((pick, index) => {
+                  const item = byId(pick.id);
+                  if (!item) return null;
+                  const img = itemImage(item);
                   return (
                     <Link
-                      key={p.id}
+                      key={pick.id}
                       to="/menu"
-                      search={{ cat: m.category, item: m.id }}
-                      className="group lift animate-pop flex flex-col overflow-hidden rounded-lg border border-line-dark bg-charcoal text-start hover:shadow-glow"
-                      style={{ animationDelay: `${i * 140}ms` }}
+                      search={{ cat: item.category, item: item.id }}
+                      className="cw-card group lift animate-pop flex flex-col overflow-hidden text-start hover:shadow-glow"
+                      style={{ animationDelay: `${index * 140}ms` }}
                     >
-                      <div className="relative aspect-[4/3] overflow-hidden">
+                      <div className="relative aspect-[4/3] overflow-hidden bg-charcoal">
                         <Photo
-                          img={itemImage(m)}
+                          img={img}
                           className="transition-transform duration-700 group-hover:scale-110"
                         />
                         <span className="font-display absolute start-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-amber text-lg font-bold text-charcoal">
-                          {i + 1}
+                          {index + 1}
                         </span>
                       </div>
                       <div className="flex flex-1 flex-col gap-2 p-5">
-                        <span className="eyebrow !text-[0.65rem] !text-amber">
+                        <span className="eyebrow !text-[0.65rem]">
                           {lang === "ar"
-                            ? categoryById(m.category).nameAr
-                            : categoryById(m.category).nameEn}
+                            ? categoryById(item.category).nameAr
+                            : categoryById(item.category).nameEn}
                         </span>
-                        <h3 className="font-display text-xl font-semibold" dir="ltr">
-                          {m.nameEn}
+                        <h3 className="font-display text-xl font-semibold" dir="auto">
+                          {itemName(item)}
                         </h3>
-                        <p className="text-sm text-on-dark-muted" dir="auto">
-                          {p.reason}
+                        <p className="text-sm text-muted-foreground" dir="auto">
+                          {pick.reason}
                         </p>
-                        {p.fun && (
+                        {pick.fun && (
                           <p
-                            className="mt-1 flex items-start gap-2 text-sm italic text-lavender"
+                            className="mt-1 flex items-start gap-2 text-sm italic text-coffee"
                             dir="auto"
                           >
-                            <Sparkle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {p.fun}
+                            <Sparkle className="mt-0.5 h-4 w-4 shrink-0" /> {pick.fun}
                           </p>
                         )}
-                        <span className="mt-auto inline-flex items-center gap-1 pt-3 text-sm font-bold text-amber">
+                        <span className="mt-auto inline-flex items-center gap-1 pt-3 text-sm font-bold text-coffee">
                           {o.view}{" "}
-                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
+                          <ArrowRight
+                            className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1"
+                            aria-hidden="true"
+                          />
                         </span>
                       </div>
                     </Link>
                   );
                 })}
               </div>
-              {result.pairing && byId(result.pairing.id) && (
+              {result.pairing && pairing && (
                 <Link
                   to="/menu"
-                  search={{ cat: byId(result.pairing.id)!.category, item: result.pairing.id }}
-                  className="group animate-pop mt-4 flex items-center gap-4 rounded-lg border border-dashed border-amber/50 p-4 hover:bg-charcoal"
+                  search={{ cat: pairing.category, item: pairing.id }}
+                  className="cw-card group animate-pop mt-4 flex items-center gap-4 border-dashed p-4 hover:border-amber"
                   style={{ animationDelay: "480ms" }}
                 >
-                  <span
-                    className="text-2xl transition-transform group-hover:rotate-12"
-                    aria-hidden="true"
-                  >
-                    🥐
+                  <span className="cw-icon-tile h-12 w-12 shrink-0 transition-transform group-hover:rotate-6">
+                    <Croissant className="h-6 w-6" strokeWidth={1.75} aria-hidden="true" />
                   </span>
                   <span>
-                    <span className="eyebrow !text-[0.65rem] !text-amber">{o.pairing}</span>
-                    <span className="font-display block text-lg font-semibold" dir="ltr">
-                      {byId(result.pairing.id)!.nameEn}
+                    <span className="eyebrow !text-[0.65rem]">{o.pairing}</span>
+                    <span className="font-display block text-lg font-semibold" dir="auto">
+                      {itemName(pairing)}
                     </span>
-                    <span className="block text-sm text-on-dark-muted" dir="auto">
+                    <span className="block text-sm text-muted-foreground" dir="auto">
                       {result.pairing.reason}
                     </span>
                   </span>
                 </Link>
               )}
-              <p className="mt-6 text-xs text-on-dark-muted">{o.disclaimer}</p>
+              <p className="mt-6 text-xs text-muted-foreground">{o.disclaimer}</p>
             </div>
           ) : (
             <form
-              onSubmit={(e) => {
-                e.preventDefault();
+              onSubmit={(event) => {
+                event.preventDefault();
                 void cast();
               }}
             >
               <fieldset>
                 <legend className="font-display text-lg font-semibold">{o.flavorsLabel}</legend>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {FLAVORS.map((f) => {
-                    const on = flavors.includes(f);
+                  {FLAVORS.map((flavor) => {
+                    const selected = flavors.includes(flavor);
+                    const FlavorIcon = FLAVOR_ICONS[flavor];
                     return (
                       <button
-                        key={f}
+                        key={flavor}
                         type="button"
-                        aria-pressed={on}
-                        onClick={() => toggle(f)}
-                        className={`group inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-300 active:scale-95 ${
-                          on
-                            ? "scale-105 border-amber bg-amber text-charcoal shadow-glow"
-                            : "border-line-dark hover:-translate-y-0.5 hover:border-amber"
-                        }`}
+                        aria-pressed={selected}
+                        onClick={() => toggle(flavor)}
+                        className="cw-chip group px-3 py-2 text-sm font-semibold active:scale-95 sm:px-4"
                       >
                         <span
-                          className={`text-base ${on ? "animate-wiggle" : "group-hover:animate-wiggle"}`}
-                          aria-hidden="true"
+                          className={`cw-icon-tile h-8 w-8 ${selected ? "animate-wiggle" : "group-hover:animate-wiggle"}`}
                         >
-                          {EMOJI[f]}
+                          <FlavorIcon className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
                         </span>
-                        {o.flavors[f]}
+                        {o.flavors[flavor]}
                       </button>
                     );
                   })}
@@ -271,23 +289,22 @@ export function WizardOracle() {
 
               <fieldset className="mt-8">
                 <legend className="font-display text-lg font-semibold">{o.tempLabel}</legend>
-                <div
-                  className="mt-4 inline-flex rounded-full border border-line-dark p-1"
-                  role="radiogroup"
-                >
-                  {(["hot", "iced", "any"] as const).map((v) => (
-                    <button
-                      key={v}
-                      type="button"
-                      role="radio"
-                      aria-checked={temp === v}
-                      onClick={() => setTemp(v)}
-                      className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${temp === v ? "bg-cream text-charcoal" : "text-on-dark-muted hover:text-on-dark"}`}
-                    >
-                      {v === "hot" ? "☕ " : v === "iced" ? "🧊 " : "🎲 "}
-                      {o.temps[v]}
-                    </button>
-                  ))}
+                <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label={o.tempLabel}>
+                  {(["hot", "iced", "any"] as const).map((value) => {
+                    const TempIcon = TEMP_ICONS[value];
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        aria-pressed={temp === value}
+                        onClick={() => setTemp(value)}
+                        className="cw-chip px-4 py-2 text-sm font-semibold"
+                      >
+                        <TempIcon className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+                        {o.temps[value]}
+                      </button>
+                    );
+                  })}
                 </div>
               </fieldset>
 
@@ -295,21 +312,25 @@ export function WizardOracle() {
                 <span className="font-display text-lg font-semibold">{o.noteLabel}</span>
                 <textarea
                   value={note}
-                  onChange={(e) => setNote(e.target.value.slice(0, MAX_NOTE))}
+                  onChange={(event) => setNote(event.target.value.slice(0, MAX_NOTE))}
                   rows={3}
                   placeholder={o.notePlaceholder}
-                  className="mt-3 w-full resize-none rounded-lg border border-line-dark bg-charcoal p-4 text-on-dark placeholder:text-on-dark-muted/70 focus:border-amber focus:outline-none"
+                  className="mt-3 w-full resize-none rounded-lg border border-input bg-background p-4 text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus-visible:ring-2 focus-visible:ring-amber"
                 />
-                <span className="mt-1 block text-end text-xs text-on-dark-muted" dir="ltr">
+                <span className="mt-1 block text-end text-xs text-muted-foreground" dir="ltr">
                   {note.length}/{MAX_NOTE}
                 </span>
               </label>
 
               <div className="mt-6 flex flex-wrap items-center gap-4">
                 <button type="submit" className="btn-amber group">
-                  <Wand2 className="h-4 w-4 transition-transform group-hover:-rotate-12" /> {o.cta}
+                  <Wand2
+                    className="h-4 w-4 transition-transform group-hover:-rotate-12"
+                    aria-hidden="true"
+                  />{" "}
+                  {o.cta}
                 </button>
-                <Steam className="text-on-dark-muted" />
+                <Steam className="text-muted-foreground" />
                 {error && (
                   <p className="text-sm font-semibold text-heart" role="alert">
                     {error}
