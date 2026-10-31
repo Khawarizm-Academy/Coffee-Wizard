@@ -9,7 +9,11 @@ export function LanguageSwitcher({ tone = "dark" }: { tone?: "dark" | "light" })
   const { lang, setLang } = useLang();
   const base = tone === "dark" ? "border-line-dark text-on-dark" : "border-border text-foreground";
   return (
-    <div role="group" aria-label="Language" className={`inline-flex rounded-full border p-0.5 text-sm ${base}`}>
+    <div
+      role="group"
+      aria-label="Language"
+      className={`inline-flex rounded-full border p-0.5 text-sm ${base}`}
+    >
       {(["en", "ar"] as const).map((l) => (
         <button
           key={l}
@@ -34,6 +38,8 @@ function useNavLinks() {
     { label: t.nav.home, to: "/" as const },
     { label: t.nav.story, to: "/" as const, hash: "story" },
     { label: t.nav.menu, to: "/menu" as const },
+    { label: t.nav.wizard, to: "/" as const, hash: "oracle" },
+    { label: t.nav.order, to: "/order" as const },
     { label: t.nav.specialty, to: "/" as const, hash: "specialty" },
     { label: t.nav.bakery, to: "/" as const, hash: "bakery" },
     { label: t.nav.findUs, to: "/" as const, hash: "find-us" },
@@ -52,7 +58,7 @@ export function Navbar() {
         <Link to="/" aria-label="Coffee Wizard" className="text-on-dark">
           <Logo />
         </Link>
-        <nav className="hidden items-center gap-6 lg:flex" aria-label="Main">
+        <nav className="hidden items-center gap-4 xl:flex 2xl:gap-6" aria-label="Main">
           {links.map((l) => (
             <Link
               key={l.label}
@@ -66,13 +72,13 @@ export function Navbar() {
             </Link>
           ))}
         </nav>
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden items-center gap-3 xl:flex">
           <LanguageSwitcher />
           <Link to="/menu" className="btn-amber !px-5 !py-2 text-sm">
             {t.nav.cta}
           </Link>
         </div>
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex items-center gap-2 xl:hidden">
           <LanguageSwitcher />
           <button
             type="button"
@@ -86,7 +92,7 @@ export function Navbar() {
         </div>
       </div>
       {open && (
-        <nav className="border-t border-line-dark lg:hidden" aria-label="Mobile">
+        <nav className="border-t border-line-dark xl:hidden" aria-label="Mobile">
           <ul className="container-cw flex flex-col py-3">
             {links.map((l) => (
               <li key={l.label}>
@@ -128,7 +134,11 @@ export function Footer() {
           <ul className="mt-4 grid grid-cols-2 gap-2 text-sm">
             {links.map((l) => (
               <li key={l.label}>
-                <Link to={l.to} {...(l.hash ? { hash: l.hash } : {})} className="text-on-dark-muted hover:text-amber">
+                <Link
+                  to={l.to}
+                  {...(l.hash ? { hash: l.hash } : {})}
+                  className="text-on-dark-muted hover:text-amber"
+                >
                   {l.label}
                 </Link>
               </li>
@@ -140,7 +150,12 @@ export function Footer() {
           <ul className="mt-4 space-y-3 text-sm text-on-dark-muted">
             <li className="flex gap-2">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-amber" />
-              <a href={business.mapsUrl} target="_blank" rel="noreferrer" className="hover:text-amber">
+              <a
+                href={business.mapsUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-amber"
+              >
                 {t.location.address}
               </a>
             </li>
@@ -152,7 +167,13 @@ export function Footer() {
             </li>
             <li className="flex gap-2">
               <Instagram className="mt-0.5 h-4 w-4 shrink-0 text-amber" />
-              <a href={business.instagram} target="_blank" rel="noreferrer" className="hover:text-amber" dir="ltr">
+              <a
+                href={business.instagram}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-amber"
+                dir="ltr"
+              >
                 @coffeewizardeg
               </a>
             </li>

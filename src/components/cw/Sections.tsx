@@ -1,10 +1,22 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Coffee, Sparkles, FlaskConical, Croissant, MapPin, Phone, Clock, Instagram, ExternalLink } from "lucide-react";
+import {
+  ArrowRight,
+  Coffee,
+  Sparkles,
+  FlaskConical,
+  Croissant,
+  MapPin,
+  Phone,
+  Clock,
+  Instagram,
+  ExternalLink,
+} from "lucide-react";
 import { useLang } from "@/lib/i18n";
 import { images } from "@/content/images";
 import { categories, featured, menu } from "@/content/menu";
 import { business } from "@/content/business";
 import { Photo, ProductCard } from "./Product";
+import { Reveal, SpinBadge } from "./Motion";
 
 function Arrow() {
   return <ArrowRight className="h-4 w-4 rtl:rotate-180" />;
@@ -12,12 +24,16 @@ function Arrow() {
 
 function Heading({ eyebrow, title, light }: { eyebrow: string; title: string; light?: boolean }) {
   return (
-    <div className="max-w-2xl">
-      <p className={`eyebrow ${light ? "!text-amber" : ""}`}>{eyebrow}</p>
-      <h2 className={`font-display mt-3 text-3xl font-bold leading-tight md:text-5xl ${light ? "text-on-dark" : ""}`}>
-        {title}
-      </h2>
-    </div>
+    <Reveal>
+      <div className="max-w-2xl">
+        <p className={`eyebrow ${light ? "!text-amber" : ""}`}>{eyebrow}</p>
+        <h2
+          className={`font-display mt-3 text-3xl font-bold leading-tight md:text-5xl ${light ? "text-on-dark" : ""}`}
+        >
+          {title}
+        </h2>
+      </div>
+    </Reveal>
   );
 }
 
@@ -29,17 +45,24 @@ export function HeroSection() {
         <Photo img={images.syphonBar} eager />
         <div className="hero-overlay absolute inset-0" />
       </div>
-      <div className="container-cw flex min-h-[78vh] flex-col justify-center py-20 md:min-h-[86vh]">
-        <p className="eyebrow !text-amber">{t.hero.eyebrow}</p>
-        <h1 className="font-display mt-5 max-w-2xl text-5xl font-bold leading-[1.05] md:text-7xl">{t.hero.title}</h1>
-        <p className="mt-6 max-w-lg text-lg text-on-dark-muted">{t.hero.body}</p>
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <Link to="/menu" className="btn-amber">
-            {t.hero.primary} <Arrow />
-          </Link>
-          <Link to="/" hash="find-us" className="btn-ghost-light">
-            <MapPin className="h-4 w-4" /> {t.hero.secondary}
-          </Link>
+      <div className="container-cw relative flex min-h-[78vh] flex-col justify-center py-20 md:min-h-[86vh]">
+        <Reveal className="relative z-10 max-w-2xl">
+          <p className="eyebrow !text-amber">{t.hero.eyebrow}</p>
+          <h1 className="font-display mt-5 max-w-2xl text-5xl font-bold leading-[1.05] md:text-7xl">
+            {t.hero.title}
+          </h1>
+          <p className="mt-6 max-w-lg text-lg text-on-dark-muted">{t.hero.body}</p>
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <Link to="/menu" className="btn-amber">
+              {t.hero.primary} <Arrow />
+            </Link>
+            <Link to="/" hash="oracle" className="btn-ghost-light">
+              <Sparkles className="h-4 w-4" /> {t.hero.wizard}
+            </Link>
+          </div>
+        </Reveal>
+        <div className="absolute end-8 top-1/2 z-0 hidden -translate-y-1/2 xl:block">
+          <SpinBadge text={t.hero.badge} className="h-32 w-32 text-amber opacity-90" />
         </div>
       </div>
     </section>
@@ -49,15 +72,18 @@ export function HeroSection() {
 export function BrandStory() {
   const { t } = useLang();
   return (
-    <section id="story" className="container-cw grid items-center gap-10 py-20 md:grid-cols-2 md:py-28">
-      <div className="grid grid-cols-2 gap-3">
+    <section
+      id="story"
+      className="container-cw grid items-center gap-10 py-20 md:grid-cols-2 md:py-28"
+    >
+      <Reveal className="grid grid-cols-2 gap-3">
         <div className="aspect-[3/4] overflow-hidden rounded-lg">
           <Photo img={images.barista} />
         </div>
         <div className="mt-10 aspect-[3/4] overflow-hidden rounded-lg">
           <Photo img={images.hatWall} />
         </div>
-      </div>
+      </Reveal>
       <div>
         <Heading eyebrow={t.story.eyebrow} title={t.story.title} />
         <p className="mt-6 text-lg">{t.story.body1}</p>
@@ -76,25 +102,30 @@ export function CategoryGrid() {
     <section className="bg-cream-deep py-20 md:py-28">
       <div className="container-cw">
         <Heading eyebrow={t.categories.eyebrow} title={t.categories.title} />
-        <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
+        <Reveal delay={100} className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
           {categories.map((c) => (
             <Link
               key={c.id}
               to="/menu"
               search={{ cat: c.id }}
-              className="group relative aspect-[4/5] overflow-hidden rounded-lg bg-charcoal"
+              className="group relative block aspect-[4/5] overflow-hidden rounded-lg bg-charcoal"
             >
-              <Photo img={c.image} className="transition-transform duration-500 group-hover:scale-105" />
+              <Photo
+                img={c.image}
+                className="transition-transform duration-500 group-hover:scale-105"
+              />
               <div className="card-overlay absolute inset-0" />
               <div className="absolute inset-x-0 bottom-0 p-4 text-on-dark">
-                <h3 className="font-display text-lg font-semibold md:text-xl">{lang === "ar" ? c.nameAr : c.nameEn}</h3>
+                <h3 className="font-display text-lg font-semibold md:text-xl">
+                  {lang === "ar" ? c.nameAr : c.nameEn}
+                </h3>
                 <span className="mt-1 inline-flex items-center gap-1 text-xs font-bold text-amber">
                   {t.categories.view} <Arrow />
                 </span>
               </div>
             </Link>
           ))}
-        </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -105,11 +136,11 @@ export function FeaturedProducts() {
   return (
     <section className="container-cw py-20 md:py-28">
       <Heading eyebrow={t.featured.eyebrow} title={t.featured.title} />
-      <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <Reveal delay={100} className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {featured.map((m) => (
           <ProductCard key={m.id} item={m} linkToMenu />
         ))}
-      </div>
+      </Reveal>
     </section>
   );
 }
@@ -132,8 +163,12 @@ export function SpecialtyCoffeeSection() {
                   className="group flex items-center justify-between gap-4 py-4"
                 >
                   <span className="flex items-baseline gap-4">
-                    <span className="font-display text-sm text-amber" dir="ltr">0{i + 1}</span>
-                    <span className="font-display text-2xl font-semibold" dir="ltr">{m.nameEn}</span>
+                    <span className="font-display text-sm text-amber" dir="ltr">
+                      0{i + 1}
+                    </span>
+                    <span className="font-display text-2xl font-semibold" dir="ltr">
+                      {m.nameEn}
+                    </span>
                   </span>
                   <span className="text-sm text-on-dark-muted group-hover:text-amber">
                     {(lang === "ar" ? m.descriptionAr : m.descriptionEn) ?? ""}
@@ -143,7 +178,7 @@ export function SpecialtyCoffeeSection() {
             ))}
           </ul>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <Reveal delay={120} className="grid grid-cols-2 gap-3">
           <div className="col-span-2 aspect-[16/9] overflow-hidden rounded-lg">
             <Photo img={images.slowBrew} />
           </div>
@@ -153,7 +188,7 @@ export function SpecialtyCoffeeSection() {
           <div className="aspect-square overflow-hidden rounded-lg">
             <Photo img={images.brewBar} />
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -177,7 +212,7 @@ export function BakerySection() {
           {t.bakery.cta} <Arrow />
         </Link>
       </div>
-      <div className="mt-10 grid gap-4 md:grid-cols-3">
+      <Reveal delay={100} className="mt-10 grid gap-4 md:grid-cols-3">
         {tiles.map((tile, i) => (
           <Link
             key={tile.id}
@@ -185,14 +220,20 @@ export function BakerySection() {
             search={{ cat: "bakery", item: tile.id }}
             className={`group relative overflow-hidden rounded-lg bg-charcoal ${i === 0 ? "aspect-[4/5] md:row-span-2 md:aspect-auto" : "aspect-[4/3]"}`}
           >
-            <Photo img={tile.img} className="transition-transform duration-500 group-hover:scale-105" />
+            <Photo
+              img={tile.img}
+              className="transition-transform duration-500 group-hover:scale-105"
+            />
             <div className="card-overlay absolute inset-0" />
-            <h3 className="font-display absolute bottom-4 start-4 text-xl font-semibold text-on-dark" dir="ltr">
+            <h3
+              className="font-display absolute bottom-4 start-4 text-xl font-semibold text-on-dark"
+              dir="ltr"
+            >
               {tile.name}
             </h3>
           </Link>
         ))}
-      </div>
+      </Reveal>
       <p className="mt-3 text-xs text-muted-foreground">{t.bakery.illustrative}</p>
     </section>
   );
@@ -205,7 +246,7 @@ export function BenefitsSection() {
     <section className="bg-cream-deep py-20">
       <div className="container-cw">
         <p className="eyebrow text-center">{t.benefits.eyebrow}</p>
-        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <Reveal delay={100} className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {t.benefits.items.map((b, i) => {
             const Icon = icons[i] ?? Coffee;
             return (
@@ -218,7 +259,7 @@ export function BenefitsSection() {
               </div>
             );
           })}
-        </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -226,11 +267,18 @@ export function BenefitsSection() {
 
 export function Gallery() {
   const { t } = useLang();
-  const g = [images.counter, images.hatWall, images.syphonBar, images.retail, images.brewBar, images.barista];
+  const g = [
+    images.counter,
+    images.hatWall,
+    images.syphonBar,
+    images.retail,
+    images.brewBar,
+    images.barista,
+  ];
   return (
     <section className="container-cw py-20 md:py-28">
       <Heading eyebrow={t.gallery.eyebrow} title={t.gallery.title} />
-      <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4 md:grid-rows-2">
+      <Reveal delay={100} className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4 md:grid-rows-2">
         {g.map((img, i) => (
           <div
             key={img.src}
@@ -241,7 +289,7 @@ export function Gallery() {
             <Photo img={img} />
           </div>
         ))}
-      </div>
+      </Reveal>
     </section>
   );
 }
@@ -257,14 +305,18 @@ export function LocationSection() {
             <div className="flex gap-4">
               <MapPin className="mt-1 h-5 w-5 shrink-0 text-amber" />
               <div>
-                <dt className="text-xs uppercase tracking-widest text-on-dark-muted">{t.location.addressLabel}</dt>
+                <dt className="text-xs uppercase tracking-widest text-on-dark-muted">
+                  {t.location.addressLabel}
+                </dt>
                 <dd className="mt-1 text-lg">{t.location.address}</dd>
               </div>
             </div>
             <div className="flex gap-4">
               <Phone className="mt-1 h-5 w-5 shrink-0 text-amber" />
               <div>
-                <dt className="text-xs uppercase tracking-widest text-on-dark-muted">{t.location.phoneLabel}</dt>
+                <dt className="text-xs uppercase tracking-widest text-on-dark-muted">
+                  {t.location.phoneLabel}
+                </dt>
                 <dd className="mt-1 text-lg">
                   <a href={business.phoneHref} dir="ltr" className="hover:text-amber">
                     {business.phoneDisplay}
@@ -275,7 +327,9 @@ export function LocationSection() {
             <div className="flex gap-4">
               <Clock className="mt-1 h-5 w-5 shrink-0 text-amber" />
               <div>
-                <dt className="text-xs uppercase tracking-widest text-on-dark-muted">{t.location.hoursLabel}</dt>
+                <dt className="text-xs uppercase tracking-widest text-on-dark-muted">
+                  {t.location.hoursLabel}
+                </dt>
                 <dd className="mt-1 text-lg">{t.location.hours}</dd>
               </div>
             </div>
@@ -287,12 +341,20 @@ export function LocationSection() {
             <a href={business.talabat} target="_blank" rel="noreferrer" className="btn-ghost-light">
               {t.location.order} <ExternalLink className="h-4 w-4" />
             </a>
-            <a href={business.instagram} target="_blank" rel="noreferrer" className="btn-ghost-light">
+            <a
+              href={business.instagram}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-ghost-light"
+            >
               <Instagram className="h-4 w-4" /> {t.location.instagram}
             </a>
           </div>
         </div>
-        <div className="aspect-[4/3] overflow-hidden rounded-lg border border-line-dark">
+        <Reveal
+          delay={140}
+          className="aspect-[4/3] overflow-hidden rounded-lg border border-line-dark"
+        >
           <iframe
             title="Coffee Wizard on Google Maps"
             src="https://www.google.com/maps?q=Coffee+Wizard+El+Gomhouria+Mansoura&output=embed"
@@ -300,7 +362,7 @@ export function LocationSection() {
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           />
-        </div>
+        </Reveal>
       </div>
     </section>
   );
