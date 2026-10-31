@@ -238,11 +238,22 @@
   padding: 0.8rem 1.6rem;
   font-weight: 700;
   font-size: 0.95rem;
-  background: var(--amber);
+  background: var(--gradient-brass);
+  background-size: 200% auto;
   color: var(--charcoal);
-  transition: background 0.2s;
+  transition: background-position 0.5s, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s;
   &:hover {
-    background: var(--amber-strong);
+    background-position: right center;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: var(--shadow-glow);
+  }
+  &:active {
+    transform: scale(0.97);
+  }
+  &:disabled {
+    opacity: 0.6;
+    transform: none;
+    cursor: progress;
   }
 }
 
@@ -279,4 +290,56 @@
     background: var(--charcoal);
     color: var(--cream);
   }
+}
+
+/* ---------- Motion + texture utilities ---------- */
+
+@utility reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  &[data-shown="true"] {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The black subway tiles behind the Coffee Wizard bar */
+@utility bg-tiles {
+  background-color: var(--charcoal);
+  background-image:
+    linear-gradient(oklch(1 0 0 / 4.5%) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(1 0 0 / 4.5%) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(1 0 0 / 4.5%) 1px, transparent 1px);
+  background-size: 64px 32px, 64px 64px, 64px 64px;
+  background-position: 0 0, 0 0, 32px 32px;
+}
+
+@utility text-brass {
+  background: var(--gradient-brass);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 5s linear infinite;
+}
+
+@utility shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+@utility lift {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s;
+  &:hover {
+    transform: translateY(-6px) rotate(-0.6deg);
+  }
+}
+
+@utility mask-fade-x {
+  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
 }
